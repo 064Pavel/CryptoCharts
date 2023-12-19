@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./:/var/www
+      - ./.docker/nginx/conf.d/:/etc/nginx/conf.d
+    ports:
+      - "8080:80"
+    depends_on:
+      - app
+    container_name: crypto_nginx
+    environment:
+      PHP_MEMORY_LIMIT: 512M
+      PHP_POST_MAX_SIZE: 200M
+      PHP_UPLOAD_MAX_FILESIZE: 200M
+
+  app:
+    build:
+      context: .
+      dockerfile: .docker/app/Dockerfile
+    volumes:
+      - ./:/var/www
+    depends_on:
+      - db
+    container_name: crypto_app
+
+  db:
+    image: mysql:8.0
+    restart: always
+    volumes:
+      - ./tmp/db:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: crypto
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    container_name: crypto_db
