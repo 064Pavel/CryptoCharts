@@ -4,31 +4,40 @@ require_once "../vendor/autoload.php";
 
 use App\ApiServices\BybitApiService;
 use App\Controller\CandleController;
-use App\Model\BybitDataModel;
 use App\Database\Database;
 use App\Database\QueryExecutor;
+use App\Model\BybitDataModel;
+use App\Router\Router;
 
 $configFile = '../config/database.php';
-
 if (!file_exists($configFile)) {
-    exit("Config file not found: $configFile");
+    header('HTTP/1.0 500 Internal Server Error');
+    echo 'Config file not found';
+    exit();
 }
-
 $config = require_once $configFile;
 
 $database = new Database($config);
 $pdo = $database->getPDO();
 
-const CATEGORY_LINEAR = 'linear';
-const SYMBOL_BTCUSDT = 'BTCUSDT';
-const INTERVAL_5 = '5';
+$router = new Router();
 
-$bybitApi = new BybitApiService();
-$dataModel = new BybitDataModel($bybitApi);
-$queryExecutor = new QueryExecutor($pdo);
+$candleController = new CandleController(new BybitDataModel(new BybitApiService()), new QueryExecutor($pdo));
 
-$candleController = new CandleController($dataModel, $queryExecutor);
-$candleController->processCandles();
+$router->get('/api/data', function () use ($candleController) {
 
+    $data = $candleController->getData();
 
+    header('Content-Type: application/json');
+    echo json_encode($data);
 
+    exit();
+});
+
+$router->get('/', function () use ($candleController){
+
+    $candleController->index();
+
+    exit();
+});
+$router->handle($_SERVER['REQUEST_URI']);

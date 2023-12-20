@@ -39,4 +39,26 @@ class CandleController
             echo "No data to process.";
         }
     }
+
+    public function getData()
+    {
+        $this->processCandles();
+
+        $query = "SELECT * FROM candles";
+
+        try {
+            $candles = $this->queryExecutor->executeQuery($query);
+
+            return $candles;
+
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function index()
+    {
+        include_once __DIR__ . "/../../public/view.php";
+    }
+
 }
