@@ -22,7 +22,14 @@ $pdo = $database->getPDO();
 
 $router = new Router();
 
-$candleController = new CandleController(new BybitDataModel(new BybitApiService()), new QueryExecutor($pdo));
+const CATEGORY_LINEAR = 'linear';
+const SYMBOL_BTCUSDT = 'BTCUSDT';
+const INTERVAL_5 = '5';
+
+$bybitApi = new BybitApiService();
+
+$bybitDataModel = new BybitDataModel($bybitApi,CATEGORY_LINEAR, SYMBOL_BTCUSDT, INTERVAL_5);
+$candleController = new CandleController($bybitDataModel, new QueryExecutor($pdo));
 
 $router->get('/api/data', function () use ($candleController) {
 
