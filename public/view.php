@@ -29,7 +29,7 @@
     }
 
     function fetchDataAndRender() {
-        fetch('http://89.104.67.142/api/data')
+        fetch('http://37.140.192.74/api/data')
             .then(response => response.json())
             .then(data => {
                 if (data && Array.isArray(data) && data.length > 0) {
