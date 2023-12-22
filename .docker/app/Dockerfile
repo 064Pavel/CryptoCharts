@@ -1,17 +1,17 @@
-# Используем официальный образ PHP 8.1 FPM
 FROM php:8.1-fpm
 
-# Устанавливаем необходимые расширения
-RUN docker-php-ext-install pdo_mysql
+RUN apt-get update \
+  && apt-get install -y libzip-dev zip \
+  && docker-php-ext-install zip pdo_mysql \
+  && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Копируем пользовательский php.ini
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
-# Устанавливаем рабочую директорию
-WORKDIR /var/www/html
+RUN curl -sS https://getcomposer.org/installer | php && \
+    mv composer.phar /usr/local/bin/composer
 
-# Опционально можно добавить другие настройки и инструкции по установке зависимостей
+RUN composer install
+
+EXPOSE 80
+
 
