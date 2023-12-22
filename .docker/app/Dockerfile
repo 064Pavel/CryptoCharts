@@ -1,28 +1,31 @@
-# Используйте официальный образ PHP 8.1 FPM
-FROM php:8.1-fpm
+FROM php:8.2-fpm
 
-# Копирование кастомного php.ini файла
+RUN apt-get update && apt-get install -y \
+      apt-utils \
+      libpq-dev \
+      libpng-dev \
+      libzip-dev \
+      zip unzip \
+      git && \
+      docker-php-ext-install pdo_mysql && \
+      docker-php-ext-install bcmath && \
+      docker-php-ext-install gd && \
+      docker-php-ext-install zip && \
+      apt-get clean && \
+      rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
-# Установка необходимых зависимостей
-RUN apt-get update && apt-get install -y \
-    libzip-dev \
-    && docker-php-ext-install zip pdo_mysql
+# Install composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --filename=composer \
+    --install-dir=/usr/local/bin
 
-# Установка Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Рабочая директория для приложения
 WORKDIR /var/www
 
-# Копирование зависимостей проекта (если уже есть composer.json и composer.lock)
-COPY composer.json composer.lock /var/www/
+COPY . /var/www
+RUN composer install --prefer-dist --no-progress --no-suggest --no-interaction
 
-# Установка зависимостей
-RUN composer install --no-scripts --no-autoloader
-
-# Копирование остальных файлов проекта
-COPY . .
-
-# Запуск Composer с автозагрузкой после копирования файлов
-RUN composer dump-autoload --optimize
+# Check version of composer
+RUN composer -v
