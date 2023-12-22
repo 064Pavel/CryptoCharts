@@ -1,6 +1,7 @@
 FROM php:8.2-fpm
 
 RUN apt-get update && apt-get install -y \
+    --no-install-recommends \ # добавьте эту опцию
     apt-utils \
     libpq-dev \
     libpng-dev \
@@ -14,6 +15,7 @@ RUN apt-get update && apt-get install -y \
     docker-php-ext-install pdo_mysql && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
