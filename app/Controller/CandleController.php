@@ -18,10 +18,14 @@ class CandleController
 
     public function processCandles()
     {
+        $this->queryExecutor->executeQuery("TRUNCATE TABLE candles");
+
         $candles = $this->dataModel->getCandles();
 
         if (!empty($candles)) {
             foreach ($candles as $candle) {
+                $candle[0] = $candle[0] / 1000;
+
                 $query = "INSERT INTO candles (time, open, close, low, high, volume, turnover) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $values = [
                     $candle[0],
@@ -40,19 +44,20 @@ class CandleController
         }
     }
 
+
     public function getData()
     {
-        $this->processCandles();
-
-        $query = "SELECT * FROM candles";
-
         try {
+            $this->processCandles();
+
+            $query = "SELECT * FROM candles";
             $candles = $this->queryExecutor->executeQuery($query);
 
             return $candles;
-
         } catch (\Exception $e) {
-            throw $e;
+            header('HTTP/1.1 500 Internal Server Error');
+            echo json_encode(['error' => $e->getMessage()]);
+            exit();
         }
     }
 

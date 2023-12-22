@@ -5,7 +5,7 @@ class BybitApiService
 {
     private string $baseUrl = 'https://api-testnet.bybit.com/v5/market/';
 
-    public function getData(string $category, string $symbol, string $interval)
+    public function getData(string $category, string $symbol, string $interval, string $limit)
     {
         $url = $this->baseUrl . 'kline';
 
@@ -13,6 +13,7 @@ class BybitApiService
             'category' => $category,
             'symbol'   => $symbol,
             'interval' => $interval,
+            'limit'    => $limit,
         ];
 
         return $this->buildRequest($url, $params);
