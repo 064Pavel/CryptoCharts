@@ -15,7 +15,6 @@ class BybitApiService
             'interval' => $interval,
             'limit'    => $limit,
         ];
-
         return $this->buildRequest($url, $params);
     }
 
