@@ -1,7 +1,12 @@
 FROM php:8.2-fpm
 
-RUN apt-get update && apt-get install -y \
-    --no-install-recommends \ # добавьте эту опцию
+# Использовать другое зеркало Debian и обойти ошибку с apt-utils
+RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list && \
+    apt-get update || true
+
+# Установка необходимых пакетов
+RUN apt-get install -y \
+    --no-install-recommends \
     apt-utils \
     libpq-dev \
     libpng-dev \
@@ -11,11 +16,9 @@ RUN apt-get update && apt-get install -y \
     docker-php-ext-install pdo_pgsql && \
     docker-php-ext-configure gd --with-jpeg && \
     docker-php-ext-install -j$(nproc) gd zip && \
-    docker-php-ext-install bcmath && \
-    docker-php-ext-install pdo_mysql && \
+    docker-php-ext-install bcmath pdo_mysql && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
