@@ -1,8 +1,10 @@
 FROM php:8.2-fpm
 
 # Замена зеркал Debian на официальные
-RUN sed -i 's/deb.debian.org/deb.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's/security.debian.org/security.debian.org/g' /etc/apt/sources.list
+RUN echo "deb http://deb.debian.org/debian buster main" > /etc/apt/sources.list && \
+    echo "deb-src http://deb.debian.org/debian buster main" >> /etc/apt/sources.list && \
+    echo "deb http://security.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list && \
+    echo "deb-src http://security.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list
 
 # Установка зависимостей и расширений PHP
 RUN apt-get update \
@@ -33,4 +35,3 @@ WORKDIR /var/www
 # Копирование приложения и установка зависимостей Composer
 COPY . /var/www
 RUN composer install --prefer-dist --no-progress --no-suggest --no-interaction
-
