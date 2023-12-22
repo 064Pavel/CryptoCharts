@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     unzip \
     git && \
-    docker-php-ext-install pdo_pgsql && \
+    docker-php-ext-install pdo_mysql && \
     docker-php-ext-configure gd --with-jpeg && \
     docker-php-ext-install -j$(nproc) gd zip && \
     docker-php-ext-install bcmath pdo_mysql && \
