@@ -1,28 +1,29 @@
-FROM php:8.2-fpm
+# Используем официальный образ PHP 8.0 FPM
+FROM php:8.0-fpm
 
-RUN apt-get update && apt-get install -y \
-      apt-utils \
-      libpq-dev \
-      libpng-dev \
-      libzip-dev \
-      zip unzip \
-      git && \
-      docker-php-ext-install pdo_mysql && \
-      docker-php-ext-install bcmath && \
-      docker-php-ext-install gd && \
-      docker-php-ext-install zip && \
-      apt-get clean && \
-      rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Устанавливаем Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Добавляем Composer в переменную среды PATH
+RUN mv composer.phar /usr/local/bin/composer
+
+# Устанавливаем расширения PHP для работы с MySQL
+RUN docker-php-ext-install mysqli pdo pdo_mysql
+
+# Копируем кастомный php.ini
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
 
-# Install composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --filename=composer \
-    --install-dir=/usr/local/bin
+# Устанавливаем пакеты, необходимые для установки Composer
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip
 
-WORKDIR /var/www
+# Опционально можно установить другие зависимости, если они нужны для вашего проекта
 
-COPY . /var/www
-RUN composer install --prefer-dist --no-progress --no-suggest --no-interaction --ignore-platform-reqs
+# Ваш код и инструкции по запуску приложения
+
+# Помечаем порт 9000, который используется PHP-FPM
+EXPOSE 9000
+
+# Команда запуска PHP-FPM
+CMD ["php-fpm"]
