@@ -29,7 +29,7 @@
     }
 
     function fetchDataAndRender() {
-        fetch('http://localhost:8080/api/data')
+        fetch('http://localhost/api/data')
             .then(response => response.json())
             .then(data => {
                 if (data && Array.isArray(data) && data.length > 0) {

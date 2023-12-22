@@ -7,7 +7,7 @@ services:
       - ./:/var/www
       - ./.docker/nginx/conf.d/:/etc/nginx/conf.d
     ports:
-      - "8080:80"
+      - "80:80"
     depends_on:
       - app
     container_name: crypto_nginx
