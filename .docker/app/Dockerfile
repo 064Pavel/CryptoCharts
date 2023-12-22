@@ -1,35 +1,17 @@
-FROM php:8.2-fpm
+# Используем официальный образ PHP 8.1 FPM
+FROM php:8.1-fpm
 
-RUN apt-get update && apt-get install -y \
-      apt-utils \
-      libpq-dev \
-      libpng-dev \
-      libzip-dev \
-      libjpeg-dev \
-      zip unzip \
-      git && \
-      docker-php-ext-install pdo_mysql && \
-      docker-php-ext-configure gd --with-jpeg && \
-      docker-php-ext-install -j$(nproc) gd zip && \
-      docker-php-ext-install bcmath && \
-      apt-get clean && \
-      rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Устанавливаем необходимые расширения
+RUN docker-php-ext-install pdo_mysql
 
+# Устанавливаем Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Копируем пользовательский php.ini
 COPY ./.docker/app/php.ini /usr/local/etc/php/conf.d/php.ini
-COPY composer.*  ./
 
-# Install composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --filename=composer \
-    --install-dir=/usr/local/bin
+# Устанавливаем рабочую директорию
+WORKDIR /var/www/html
 
-RUN composer install \
-      --no-interaction \
-      --no-plugins \
-      --no-suggest \
-      --no-scripts \
-      --no-autoloader \
-      --prefer-dist
+# Опционально можно добавить другие настройки и инструкции по установке зависимостей
 
-WORKDIR /var/www
