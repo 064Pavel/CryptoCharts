@@ -1,9 +1,5 @@
 FROM php:8.2-fpm
 
-# Использовать другое зеркало Debian и обойти ошибку с apt-utils
-RUN sed -i 's/deb.debian.org/mirrors.aliyun.com/g' /etc/apt/sources.list && \
-    apt-get update || true
-
 # Установка необходимых пакетов
 RUN apt-get install -y \
     --no-install-recommends \
