@@ -23,9 +23,9 @@ $pdo = $database->getPDO();
 $router = new Router();
 
 const CATEGORY_LINEAR = 'linear';
-const SYMBOL_BTCUSDT = 'BTCUSDT';
-const INTERVAL_15 = '120';
-const LIMIT = '100';
+const SYMBOL_BTCUSDT = 'BTCUSD';
+const INTERVAL_15 = '60';
+const LIMIT = '1000';
 
 $bybitApi = new BybitApiService();
 
