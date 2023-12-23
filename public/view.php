@@ -6,7 +6,19 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>График</title>
-    <script src="https://unpkg.com/lightweight-charts@3.2.0/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+
+        #candleChart {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
 <h1>График</h1>
@@ -19,7 +31,17 @@
     function createChart(data) {
         if (data && data.length > 0) {
             try {
-                candleSeries.setData(data);
+                const seriesData = data.map((candle, index) => ({
+                    time: candle.time,
+                    open: candle.open,
+                    high: candle.high,
+                    low: candle.low,
+                    close: candle.close,
+                    color: index > 0 ? (candle.close > data[index - 1].close ? 'green' : 'red') : 'red',
+                }));
+
+
+                candleSeries.setData(seriesData);
             } catch (error) {
                 console.error('Ошибка при установке данных на график:', error);
             }
@@ -34,29 +56,33 @@
             .then(data => {
                 if (data && Array.isArray(data) && data.length > 0) {
                     const formattedData = data.map(item => {
-                        const parsedItem = {
-                            time: item.time,
-                            open: parseFloat(item.open),
+                        return {
+                            time: item.time / 1000,
+                            open: parseFloat(item.close),
                             high: parseFloat(item.high),
                             low: parseFloat(item.low),
-                            close: parseFloat(item.close),
+                            close: parseFloat(item.open),
                         };
-
-                        Object.entries(parsedItem).forEach(([key, value]) => {
-                            if (isNaN(value)) {
-                                console.error(`Ошибка: Значение ${key} (${value}) не является числом.`);
-                            }
-                        });
-
-                        return parsedItem;
                     });
 
                     formattedData.sort((a, b) => a.time - b.time);
 
                     try {
                         candleSeries.setData([]);
+
                         createChart(formattedData);
-                        // console.log('Отформатированные данные:', formattedData);
+                        console.log('Отформатированные данные:', formattedData);
+
+                        chart.timeScale().applyOptions({
+                            timeVisible: true,
+                        });
+
+                        chart.applyOptions({
+                            localization: {
+                                locale: 'ru-RU',
+                            },
+                        });
+
                     } catch (error) {
                         console.error('Ошибка при обработке данных для графика:', error);
                     }
@@ -73,6 +99,10 @@
         fetchDataAndRender();
         setInterval(fetchDataAndRender, 1000 * 60);
     });
+
 </script>
 </body>
 </html>
+
+
+

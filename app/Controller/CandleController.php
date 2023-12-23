@@ -24,7 +24,6 @@ class CandleController
 
         if (!empty($candles)) {
             foreach ($candles as $candle) {
-                $candle[0] = $candle[0] / 1000;
 
                 $query = "INSERT INTO candles (time, open, close, low, high, volume, turnover) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 $values = [
@@ -50,7 +49,7 @@ class CandleController
         try {
             $this->processCandles();
 
-            $query = "SELECT * FROM candles";
+            $query = "SELECT open, high, low, close, time FROM candles";
             $candles = $this->queryExecutor->executeQuery($query);
 
             return $candles;
