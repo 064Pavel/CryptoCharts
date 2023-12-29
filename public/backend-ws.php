@@ -4,7 +4,7 @@
     $conn->on('message', function($msg) use ($conn) {
         $data = json_decode($msg, true);
         if ($data) {
-            dump($data);
+            print_r($data);
         }
     });
 
